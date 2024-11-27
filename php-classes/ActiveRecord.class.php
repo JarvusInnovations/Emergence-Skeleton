@@ -2716,7 +2716,11 @@ class ActiveRecord
                 }
 
                 if ($related->isA($rel['class'])) {
-                    if ($existing = $rel['linkClass']::getByWhere([$rel['linkLocal'] => $this->getValue($rel['local']), $rel['linkForeign'] => $related->getValue($rel['foreign'])])) {
+                    $conditions = is_callable($rel['conditions']) ? call_user_func($rel['conditions'], $this, $relationship, $rel) : $rel['conditions'];
+                    $conditions[$rel['linkLocal']] = $this->getValue($rel['local']);
+                    $conditions[$rel['linkForeign']] = $related->getValue($rel['foreign']);
+
+                    if ($existing = $rel['linkClass']::getByWhere($conditions)) {
                         $set[] = $existing;
                     } else {
                         $set[] = $rel['linkClass']::create([

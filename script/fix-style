@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# script/fix-style: Fix all auto-fixable code style/formatting issues
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+script/-test-bootstrap
+
+
+echo
+echo "==> fix-style: formatting with prettier"
+npx prettier --write cypress/**/*.js
+
+
+echo
+echo "==> fix-style: formatting with eslint…"
+npx eslint --fix cypress/**/*.js

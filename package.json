@@ -6,7 +6,11 @@
     "csvtojson": "^2.0.10",
     "cypress": "^9.6.0",
     "cypress-plugin-tab": "^1.0.5",
-    "dayjs": "^1.10.7"
+    "dayjs": "^1.10.7",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "prettier": "^2.7.1"
   },
   "scripts": {
     "cypress:open": "cypress open"

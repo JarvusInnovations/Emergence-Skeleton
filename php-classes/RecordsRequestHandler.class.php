@@ -418,6 +418,8 @@ abstract class RecordsRequestHandler extends RequestHandler
 
             // try to save record
             try {
+                // TODO: throw record validation exception if $Record->validationErrors is pre-populated
+
                 // call template function
                 static::onBeforeRecordSaved($Record, $datum);
 
@@ -585,12 +587,20 @@ abstract class RecordsRequestHandler extends RequestHandler
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // apply delta
             static::applyRecordDelta($Record, $_REQUEST);
+            
+            // fire event
+            Emergence\EventBus::fireEvent('beforeRecordTransaction', $className::getRootClass(), array(
+                'Record' => $Record,
+                'data' => $_REQUEST
+            ));
 
             // call template function
             static::onBeforeRecordValidated($Record, $_REQUEST);
 
             // validate
-            if ($Record->validate()) {
+            if (!empty($transactionErrors)) {
+                $Record->addValidationErrors($transactionErrors);
+            } elseif (!count($Record->validationErrors) && $Record->validate()) {
                 // call template function
                 static::onBeforeRecordSaved($Record, $_REQUEST);
 

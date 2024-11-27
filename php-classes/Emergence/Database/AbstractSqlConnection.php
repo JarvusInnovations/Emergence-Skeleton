@@ -116,9 +116,11 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
 
         $statement->execute($params);
 
+        $rowCount = $statement->rowCount();
+
         $statement->closeCursor();
 
-        return true;
+        return $rowCount;
     }
 
     /**
@@ -362,6 +364,31 @@ abstract class AbstractSqlConnection implements SqlConnectionInterface
         } else {
             return $this->nonQuery($query);
         }
+    }
+
+    public function insertMultiple($table, array $rows = [])
+    {
+        $query = 'INSERT INTO ' . $this->quoteIdentifier($table);
+
+        if (empty($rows)) {
+            return 0;
+        }
+
+        $query .= ' (' . implode(',', array_map([$this, 'quoteIdentifier'], array_keys($rows[0]))) . ')';
+        $query .= ' VALUES ';
+        $numRows = 0;
+
+        foreach (array_chunk($rows, 10000) as $chunkedRows) {
+            $statement = [];
+
+            foreach ($chunkedRows as $row) {
+                $statement[] = '(' . implode(',', array_map([$this, 'quoteValue'], array_values($row))) . ')';
+            }
+
+            $numRows += $this->nonQuery($query .' ' . implode(',', $statement));
+        }
+
+        return $numRows;
     }
 
     public function update($table, $values, $where = [], $returning = null)

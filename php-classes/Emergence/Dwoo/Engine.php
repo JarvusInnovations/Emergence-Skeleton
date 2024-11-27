@@ -114,7 +114,7 @@ class Engine extends \Dwoo_Core
         // set site information
         $this->globals['Site'] = array(
             'title' => Site::$title
-            ,'degredations' => Site::getConfig('degredations')
+            ,'degradations' => Site::getConfig('degradations')
         );
 
         // add magic globals

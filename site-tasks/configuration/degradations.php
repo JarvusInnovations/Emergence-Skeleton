@@ -1,19 +1,19 @@
 <?php
 
 return [
-    'title' => 'Manage Degredations',
+    'title' => 'Manage Degradations',
     'description' => 'Enable or disable degredation flags that can be used to reduce the functionality of sites live while under failure or high load',
     'icon' => 'power-off',
     'handler' => function () {
         $config = Site::getConfig();
-        $degredations = !empty($config['degredations']) ? $config['degredations'] : [];
+        $degradations = !empty($config['degradations']) ? $config['degradations'] : [];
         $changes = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // parse degredation changes from request input
-            if (!empty($_POST['degredations']) && is_array($_POST['degredations'])) {
-                foreach ($_POST['degredations'] AS $key => $value) {
+            if (!empty($_POST['degradations']) && is_array($_POST['degradations'])) {
+                foreach ($_POST['degradations'] AS $key => $value) {
                     if ($key && is_string($key)) {
                         $changes[$key] = $value == 'on';
                     }
@@ -37,26 +37,26 @@ return [
             }
 
 
-            // apply degredations
+            // apply degradations
             if (count($changes)) {
                 foreach ($changes AS $key => $value) {
-                    if (isset($degredations[$key]) && $degredations[$key] == $value) {
+                    if (isset($degradations[$key]) && $degradations[$key] == $value) {
                         unset($changes[$key]);
                         continue;
                     }
 
-                    $degredations[$key] = $value;
+                    $degradations[$key] = $value;
                 }
 
-                $config['degredations'] = $degredations;
+                $config['degradations'] = $degradations;
 
                 // update cached site config
                 Cache::rawStore(Site::$rootPath, $config);
             }
         }
-        
-        return static::respond('degredations', [
-            'degredations' => $degredations,
+
+        return static::respond('degradations', [
+            'degradations' => $degradations,
             'changes' => $changes
         ]);
     }
